@@ -28,7 +28,6 @@ function ajouterApprenant( nom, ville) {
 // //************************************* */
 
 function enregistrerResultat(
-  apprenants,
   id,
   jour,
   exercicesPropose,
