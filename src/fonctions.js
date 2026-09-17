@@ -1,150 +1,206 @@
- function normaliserNom(nom){
-    return nom.trim()
- }
- //************************************* */
+const apprenants = require("./Data");
+
+function normaliserNom(nom) {
+  let a=nom.trim();
+   return a
+}
+console.log(normaliserNom("   ddhdhdh    "))
+//************************************* */
 function validerResultat(realises, proposes) {
-    if(realises<0 || proposes<0){ return false}
-    else if(realises>proposes ){ return false}
-    return true 
+  if (realises < 0 || proposes < 0) {
+    return false;
+  } else if (realises > proposes) {
+    return false;
+  }
+  return true;
+}
+// //************************************* */
+function ajouterApprenant( nom, ville) {
+  let apprenant = {
+    id: apprenants.length + 1,
+    nomComplet: normaliserNom(nom),
+    ville: ville,
+    resultats: [],
+  };
+  apprenants.push(apprenant);
+  return apprenant;
 }
 
- //************************************* */
- function ajouterApprenant(apprenants,nom,ville){
-      let apprenant = {
-    id: apprenants.length + 1 ,
-    nomComplet: normaliserNom(nom),
-    ville: ville ,
-    resultats: []
-   };
-   apprenants.push(apprenant);
-   return apprenant;
- }
+// //************************************* */
 
-  //************************************* */
+function enregistrerResultat(
+  apprenants,
+  id,
+  jour,
+  exercicesPropose,
+  exerciceTermine,
+  challengeTermine,
+) {
 
- function enregistrerResultat(apprenants, id,jour,exercicesPropose,exerciceTermine,challengeTermine) {
-      let apprenant = apprenants.find(function(apprenant) {
-        return apprenant.id === id;
-    });
+  let apprenant = apprenants.find(function (apprenant) {
+    return apprenant.id === id;
+  });
   if (apprenant === undefined) {
     return false;
-}
-if (!validerResultat(exerciceTermine, exercicesPropose)) {
-        return false;
-    }
-    if (jour >7 || jour<1) {
+  }
+  if (!validerResultat(exerciceTermine, exercicesPropose)) {
     return false;
-}
-let resultat = apprenant.resultats.find(function(resultat) {
+  }
+  if (jour > 7 || jour < 1) {
+    return false;
+  }
+  let resultat = apprenant.resultats.find(function (resultat) {
     return resultat.jour === jour;
-});
-if (resultat !== undefined) {
+  });
+  if (resultat !== undefined) {
     resultat.exercicesTermines = exerciceTermine;
     resultat.totalExercices = exercicesPropose;
     resultat.challengeTermine = challengeTermine;
-} else {
+  } else {
     apprenant.resultats.push({
-        jour: jour,
-        exercicesTermines: exerciceTermine,
-        totalExercices: exercicesPropose,
-        challengeTermine: challengeTermine
+      jour: jour,
+      exercicesTermines: exerciceTermine,
+      totalExercices: exercicesPropose,
+      challengeTermine: challengeTermine,
     });
-}
-return true; 
+  }
+  return true;
 }
 
- //************************************* */
+
+// //************************************* */
 
 function rechercherApprenant(apprenants, recherche) {
-    if (!isNaN(recherche)) {
-        let idNum = Number(recherche);
-        return apprenants.filter(function(a) {
-            return a.id === idNum;
-        });
-    }
-
-    let recherchePropre = recherche.trim().toLowerCase();
-    return apprenants.filter(function(a) {
-        return a.nomComplet.toLowerCase().includes(recherchePropre);
+  if (!isNaN(recherche)) {
+    let idNum = Number(recherche);
+    return apprenants.filter(function (a) {
+      return a.id === idNum;
     });
+  }
+
+  let recherchePropre = recherche.trim().toLowerCase();
+  return apprenants.filter(function (a) {
+    return a.nomComplet.toLowerCase().includes(recherchePropre);
+  });
 }
 
- //************************************* */
+// //************************************* */
 
 function calculerProgression(apprenant) {
-    let totalTermines = 0;
-    let totalProposes = 0;
-    let challengesTermines = 0;
+  let totalTermines = 0;
+  let totalProposes = 0;
+  let challengesTermines = 0;
 
-    
-    apprenant.resultats.forEach(function(r) {
-        totalTermines += r.exercicesTermines;
-        totalProposes += r.totalExercices;
-        if (r.challengeTermine) {
-            challengesTermines++;
-        }
+  apprenant.resultats.forEach(function (r) {
+    totalTermines += r.exercicesTermines;
+    totalProposes += r.totalExercices;
+    if (r.challengeTermine) {
+      challengesTermines++;
+    }
+  });
+  let pourcentage = 0;
+  if (totalProposes > 0) {
+    pourcentage = Math.round((totalTermines / totalProposes) * 100);
+  }
+  let niveau = "À renforcer";
+  if (pourcentage >= 80) {
+    niveau = "Solide";
+  } else if (pourcentage >= 50) {
+    niveau = "En progression";
+  }
+
+  let joursManquants = [];
+  let challengesManquants = [];
+
+  for (let j = 1; j <= 7; j++) {
+    let res = apprenant.resultats.find(function (r) {
+      return r.jour === j;
     });
-    let pourcentage = 0;
-    if (totalProposes > 0) {
-        pourcentage = Math.round((totalTermines / totalProposes) * 100);
-    }
-    let niveau = "À renforcer";
-    if (pourcentage >= 80) {
-        niveau = "Solide";
-    } else if (pourcentage >= 50) {
-        niveau = "En progression";
-    }
 
-    let joursManquants = [];
-    let challengesManquants = [];
-
-    for (let j = 1; j <= 7; j++) {
-        let res = apprenant.resultats.find(function(r) {
-            return r.jour === j;
-        });
-
-        if (!res) {
-            joursManquants.push(j);
-        } else if (!res.challengeTermine) {
-            challengesManquants.push(j);
-        }
+    if (!res) {
+      joursManquants.push(j);
+    } else if (!res.challengeTermine) {
+      challengesManquants.push(j);
     }
-    return {
-        totalTermines: totalTermines,
-        totalProposes: totalProposes,
-        pourcentage: pourcentage,
-        niveau: niveau,
-        challengesTermines: challengesTermines,
-        journeesRenseignees: apprenant.resultats.length,
-        joursManquants: joursManquants,
-        challengesManquants: challengesManquants
-    };
+  }
+  return {
+    totalTermines: totalTermines,
+    totalProposes: totalProposes,
+    pourcentage: pourcentage,
+    niveau: niveau,
+    challengesTermines: challengesTermines,
+    journeesRenseignees: apprenant.resultats.length,
+    joursManquants: joursManquants,
+    challengesManquants: challengesManquants,
+  };
 }
- //************************************* */
-
-
+// //************************************* */
 
 function filtrerParNiveau(apprenants, niveau) {
-    return apprenants.filter(function(a) {
-        let stats = calculerProgression(a);
-        return stats.niveau.toLowerCase() === niveau.toLowerCase();
-    })
+  return apprenants.filter(function (a) {
+    let stats = calculerProgression(a);
+    return stats.niveau.toLowerCase() === niveau.toLowerCase();
+  });
 }
 
- //************************************* */
+
+// //************************************* */
 
 function trierParProgression(apprenants) {
-    return apprenants.slice().sort(function(a, b) {
-        let statsA = calculerProgression(a);
-        let statsB = calculerProgression(b);
-        return statsB.pourcentage - statsA.pourcentage;
-    });
+  return apprenants.slice().sort(function (a, b) {
+    let statsA = calculerProgression(a);
+    let statsB = calculerProgression(b);
+    return statsB.pourcentage - statsA.pourcentage;
+  });
 }
 
- //************************************* */
+//************************************* */
 
 function trierAlphabetique(apprenants) {
-    return apprenants.slice().sort(function(a, b) {
-        return a.nomComplet.localeCompare(b.nomComplet);
-    });
+  return apprenants.slice().sort(function (a, b) {
+    return a.nomComplet.localeCompare(b.nomComplet);
+  });
+}
+
+// **************************************
+
+function afficherApprenants(apprenants) {
+     console.log("\n===== LIST DE APPRENANTS =====")
+    for (let apprenant of apprenants) {
+        console.log( `ID : ${apprenant.id}`);
+        console.log(`Nom : ${apprenant.nomComplet}`);
+        console.log(`Ville : ${apprenant.ville}`);
+
+    }
+}
+
+// **************************************
+
+function afficherTableauDeBord(apprenants) {
+    console.log("\n===== TABLEAU DE BORD =====");
+
+    console.log(`Nombre d'apprenants : ${apprenants.length}`);
+
+    for (let apprenant of apprenants) {
+        let progression = calculerProgression(apprenant);
+
+        console.log(
+            `${apprenant.nomComplet} : ${progression.pourcentage}% 
+ Niveau : ${progression.niveau}`
+        );
+    }
+}
+
+module.exports = {
+  normaliserNom,
+  validerResultat,
+  ajouterApprenant,
+  enregistrerResultat,
+  rechercherApprenant,
+  calculerProgression,
+  filtrerParNiveau,
+  trierParProgression,
+  trierAlphabetique,
+  afficherApprenants,
+  afficherTableauDeBord
 }

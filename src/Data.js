@@ -20,3 +20,4 @@ const apprenants = [
     ]
   }
 ];
+module.exports = apprenants;
