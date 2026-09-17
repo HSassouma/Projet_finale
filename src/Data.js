@@ -18,6 +18,15 @@ const apprenants = [
       { jour: 1, exercicesTermines: 12,
         totalExercices: 20, challengeTermine: false }
     ]
+  },
+   {
+    id: 3,
+    nomComplet: "Yassine ASSoumma",
+    ville: "Oujda",
+    resultats: [
+      { jour: 1, exercicesTermines: 14,
+        totalExercices: 20, challengeTermine: true }
+    ]
   }
 ];
 module.exports = apprenants;
