@@ -2,192 +2,221 @@ const prompt = require("prompt-sync")();
 const apprenants = require("./Data");
 
 const {
-    ajouterApprenant,
-    enregistrerResultat,
-    rechercherApprenant,
-    calculerProgression,
-    afficherApprenants,
-    afficherTableauDeBord
+  ajouterApprenant,
+  enregistrerResultat,
+  rechercherApprenant,
+  calculerProgression,
+  afficherApprenants,
+  afficherTableauDeBord,
+  trierAlphabetique,
+  filtrerParNiveau,
+  trierParProgression,
 } = require("./fonctions");
 
 let choix;
 
 do {
-    console.log("\n====== MENU PRINCIPAL ======");
+  console.log("\n====== MENU PRINCIPAL ======");
 
-    console.log("1. Afficher le tableau de bord");
-    console.log("2. Afficher la liste des apprenants");
-    console.log("3. Ajouter un apprenant");
-    console.log("4. Consulter un apprenant par identifiant");
-    console.log("5. Rechercher un apprenant par nom");
-    console.log("6. Ajouter ou modifier un résultat");
-    console.log("7. Filtrer les apprenants par niveau");
-    console.log("8. Trier les apprenants");
-    console.log("0. Quitter");
+  console.log("1. Afficher le tableau de bord");
+  console.log("2. Afficher la liste des apprenants");
+  console.log("3. Ajouter un apprenant");
+  console.log("4. Consulter un apprenant par identifiant");
+  console.log("5. Rechercher un apprenant par nom");
+  console.log("6. Ajouter ou modifier un résultat");
+  console.log("7. Filtrer les apprenants par niveau");
+  console.log("8. Trier les apprenants");
+  console.log("0. Quitter");
 
-    choix = prompt("Votre choix : ");
+  choix = prompt("Votre choix : ");
 
-    switch (choix) {
+  switch (choix) {
+    case "0":
+      console.log("Au revoir !");
+      break;
 
-        case "0":
-            console.log("Au revoir !");
-            break;
+    case "1":
+      afficherTableauDeBord(apprenants);
+      break;
 
-        case "1":
-            afficherTableauDeBord(apprenants);
-            break;
+    case "2":
+      afficherApprenants(apprenants);
+      break;
 
-        case "2":
-            afficherApprenants(apprenants);
-            break;
+    case "3":
+      let a = prompt("Entrer le nom : ");
+      let b = prompt("Entrer la ville : ");
 
-        case "3":
-            let a = prompt("Entrer le nom : ");
-            let b = prompt("Entrer la ville : ");
+      ajouterApprenant(a, b);
 
-            ajouterApprenant(a, b);
+      console.log("Apprenant ajouté avec succès !");
+      break;
 
-            console.log("Apprenant ajouté avec succès !");
-            break;
+    case "4":
+      let idConsultation = prompt("Entrer l'identifiant : ");
 
-        case "4":
-            let idConsultation = prompt("Entrer l'identifiant : ");
+      let resultatID = rechercherApprenant(idConsultation);
 
-            let resultatID = rechercherApprenant(idConsultation);
+      if (resultatID.length === 0) {
+        console.log("Aucun apprenant trouvé avec cet identifiant.");
+      } else {
+        console.log(resultatID);
+      }
 
-            if (resultatID.length === 0) {
-                console.log("Aucun apprenant trouvé avec cet identifiant.");
-            } else {
-                console.log(resultatID);
-            }
+      break;
 
-            break;
+    case "5":
+      let nomRecherche = prompt("Entrer le nom : ");
 
-        
+      let resultatNom = rechercherApprenant(nomRecherche);
 
-        case "5":
-            let nomRecherche = prompt("Entrer le nom : ");
+      if (resultatNom.length === 0) {
+        console.log("Aucun apprenant trouvé avec ce nom.");
+      } else {
+        console.log(resultatNom);
+      }
 
-            let resultatNom = rechercherApprenant(nomRecherche);
+      break;
 
-            if (resultatNom.length === 0) {
-                console.log("Aucun apprenant trouvé avec ce nom.");
-            } else {
-                console.log(resultatNom);
-            }
-
-            break;
-        
        case "6":
+      let id;
 
-    let id;
-
-    do {
+      do {
         id = Number(prompt("Entrer l'identifiant : "));
 
-        let apprenantExiste = apprenants.find(function(apprenant) {
-            return apprenant.id === id;
+        let apprenantExiste = apprenants.find(function (apprenant) {
+          return apprenant.id === id;
         });
 
         if (apprenantExiste === undefined) {
-            console.log("Erreur : apprenant introuvable.");
+          console.log("Erreur : apprenant introuvable.");
         }
-
-    } while (
-        apprenants.find(function(apprenant) {
-            return apprenant.id === id;
+      } while (
+        apprenants.find(function (apprenant) {
+          return apprenant.id === id;
         }) === undefined
-    );
+      );
 
+      let jour;
 
-    let jour;
-
-    do {
+      do {
         jour = Number(prompt("Entrer le numéro de journée (1-7) : "));
 
         if (!Number.isInteger(jour) || jour < 1 || jour > 7) {
-            console.log("Erreur : la journée doit être comprise entre 1 et 7.");
+          console.log("Erreur : la journée doit être comprise entre 1 et 7.");
         }
+      } while (!Number.isInteger(jour) || jour < 1 || jour > 7);
 
-    } while (!Number.isInteger(jour) || jour < 1 || jour > 7);
+      let exercicesProposes;
 
-
-    let exercicesProposes;
-
-    do {
+      do {
         exercicesProposes = Number(
-            prompt("Entrer le nombre d'exercices proposés : ")
+          prompt("Entrer le nombre d'exercices proposés : "),
         );
 
         if (!Number.isInteger(exercicesProposes) || exercicesProposes < 0) {
-            console.log("Erreur : entrez un nombre entier positif ou égal à 0.");
+          console.log("Erreur : entrez un nombre entier positif ou égal à 0.");
         }
+      } while (!Number.isInteger(exercicesProposes) || exercicesProposes < 0);
 
-    } while (
-        !Number.isInteger(exercicesProposes) ||
-        exercicesProposes < 0
-    );
+      let exercicesTermines;
 
-
-    let exercicesTermines;
-
-    do {
+      do {
         exercicesTermines = Number(
-            prompt("Entrer le nombre d'exercices terminés : ")
+          prompt("Entrer le nombre d'exercices terminés : "),
         );
 
         if (
-            !Number.isInteger(exercicesTermines) ||
-            exercicesTermines < 0 ||
-            exercicesTermines > exercicesProposes
+          !Number.isInteger(exercicesTermines) ||
+          exercicesTermines < 0 ||
+          exercicesTermines > exercicesProposes
         ) {
-            console.log(
-                "Erreur : le nombre terminé doit être entre 0 et le nombre proposé."
-            );
+          console.log(
+            "Erreur : le nombre terminé doit être entre 0 et le nombre proposé.",
+          );
         }
-
-    } while (
+      } while (
         !Number.isInteger(exercicesTermines) ||
         exercicesTermines < 0 ||
         exercicesTermines > exercicesProposes
-    );
+      );
 
+      let challenge;
 
-    let challenge;
-
-    do {
-        challenge = prompt(
-            "Challenge terminé ? (oui/non) : "
-        ).toLowerCase();
+      do {
+        challenge = prompt("Challenge terminé ? (oui/non) : ").toLowerCase();
 
         if (challenge !== "oui" && challenge !== "non") {
-            console.log("Erreur : répondez uniquement par oui ou non.");
+          console.log("Erreur : répondez uniquement par oui ou non.");
         }
+      } while (challenge !== "oui" && challenge !== "non");
 
-    } while (challenge !== "oui" && challenge !== "non");
+      let challengeTermine = challenge === "oui";
 
-
-    let challengeTermine = challenge === "oui";
-
-
-    let resultat = enregistrerResultat(
+      let resultat = enregistrerResultat(
         id,
         jour,
         exercicesProposes,
         exercicesTermines,
-        challengeTermine
-    );
+        challengeTermine,
+      );
 
-    if (resultat) {
+      if (resultat) {
         console.log("Résultat enregistré avec succès !");
-    } else {
+      } else {
         console.log("Erreur lors de l'enregistrement.");
-    }
+      }
 
-    break;
+      break;
 
-        default:
-            console.log("Choix invalide !");
-    }
+
+    case "7":
+      let niveau = prompt("Entrer le niveau : ");
+
+      let resultatNiveau = filtrerParNiveau(niveau);
+
+      if (resultatNiveau.length === 0) {
+        console.log("Aucun apprenant trouvé pour ce niveau.");
+      } else {
+        console.log(resultatNiveau);
+      }
+
+      break;
+
+
+    case "8":
+      let choixTrie;
+      do{
+        console.log("\n ============= SOUS-MENU TRI  =================")
+        console.log(" 1.Trier par progression décroissante ")
+        console.log(" 2.Trier par ordre alphabétique ")
+        console.log(" 0.Retour au menu  principal")
+        choixTrie=prompt("Votre choix :")
+
+        switch(choixTrie){
+            case"1":
+            let trieProg=trierParProgression()
+            console.log(trieProg)
+            console.log("le tri est succes")
+            break
+
+            case"2":
+            let trieAlpha=trierAlphabetique()
+            console.log(trieAlpha)
+            console.log("le tri est succes")
+            break
+
+            case"0":
+             break 
+        }
+
+      }while(choixTrie!=="0")
+        break 
+    
+
+
+    default:
+      console.log("Choix invalide !");
+  }
 
 } while (choix !== "0");

@@ -212,5 +212,5 @@ module.exports = {
   trierParProgression,
   trierAlphabetique,
   afficherApprenants,
-  afficherTableauDeBord
+  afficherTableauDeBord,
 }
