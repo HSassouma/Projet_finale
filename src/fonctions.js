@@ -1,8 +1,8 @@
 const apprenants = require("./Data");
 
 function normaliserNom(nom) {
-  let a=nom.trim();
-   return a
+  let a = nom.trim();
+  return a;
 }
 //************************************* */
 function validerResultat(realises, proposes) {
@@ -14,7 +14,7 @@ function validerResultat(realises, proposes) {
   return true;
 }
 // //************************************* */
-function ajouterApprenant( nom, ville) {
+function ajouterApprenant(nom, ville) {
   let apprenant = {
     id: apprenants.length + 1,
     nomComplet: normaliserNom(nom),
@@ -28,44 +28,40 @@ function ajouterApprenant( nom, ville) {
 // //************************************* */
 
 function enregistrerResultat(
-    id,
-    jour,
-    exercicesPropose,
-    exerciceTermine,
-    challengeTermine
+  id,
+  jour,
+  exercicesPropose,
+  exerciceTermine,
+  challengeTermine,
 ) {
+  let apprenant = apprenants.find(function (apprenant) {
+    return apprenant.id === id;
+  });
 
-    let apprenant = apprenants.find(function (apprenant) {
-        return apprenant.id === id;
+  if (apprenant === undefined) {
+    return false;
+  }
+
+  let resultat = apprenant.resultats.find(function (resultat) {
+    return resultat.jour === jour;
+  });
+
+  if (resultat !== undefined) {
+    resultat.exercicesTermines = exerciceTermine;
+    resultat.totalExercices = exercicesPropose;
+    resultat.challengeTermine = challengeTermine;
+
+    return true;
+  } else {
+    apprenant.resultats.push({
+      jour: jour,
+      exercicesTermines: exerciceTermine,
+      totalExercices: exercicesPropose,
+      challengeTermine: challengeTermine,
     });
 
-    if (apprenant === undefined) {
-        return false;
-    }
-
-    let resultat = apprenant.resultats.find(function (resultat) {
-        return resultat.jour === jour;
-    });
-
-    if (resultat !== undefined) {
-
-        resultat.exercicesTermines = exerciceTermine;
-        resultat.totalExercices = exercicesPropose;
-        resultat.challengeTermine = challengeTermine;
-
-        return true;
-
-    } else {
-
-        apprenant.resultats.push({
-            jour: jour,
-            exercicesTermines: exerciceTermine,
-            totalExercices: exercicesPropose,
-            challengeTermine: challengeTermine
-        });
-
-        return true;
-    }
+    return true;
+  }
 }
 
 // //************************************* */
@@ -91,7 +87,7 @@ function calculerProgression(apprenant) {
   let totalProposes = 0;
   let challengesTermines = 0;
 
-   apprenant.resultats.forEach(function (r) {
+  apprenant.resultats.forEach(function (r) {
     totalTermines += r.exercicesTermines;
     totalProposes += r.totalExercices;
     if (r.challengeTermine) {
@@ -143,7 +139,6 @@ function filtrerParNiveau(niveau) {
   });
 }
 
-
 // //************************************* */
 
 function trierParProgression() {
@@ -161,44 +156,65 @@ function trierAlphabetique() {
     return a.nomComplet.localeCompare(b.nomComplet);
   });
 }
-console.log(trierAlphabetique(apprenants))
+
 // **************************************
 
 function afficherApprenants() {
-     console.log("\n===== LIST DE APPRENANTS =====")
-    for (let apprenant of apprenants) {
-        console.log( `ID : ${apprenant.id}`);
-        console.log(`Nom : ${apprenant.nomComplet}`);
-        console.log(`Ville : ${apprenant.ville}`);
-
-    }
+  console.log("\n===== LIST DE APPRENANTS =====");
+  for (let apprenant of apprenants) {
+    console.log(`ID : ${apprenant.id}`);
+    console.log(`Nom : ${apprenant.nomComplet}`);
+    console.log(`Ville : ${apprenant.ville}`);
+  }
 }
 
 // **************************************
 
 function afficherTableauDeBord() {
-    console.log("\n===== TABLEAU DE BORD =====");
+  console.log("\n===== TABLEAU DE BORD =====");
+   console.log("\n========== NOMBRE D'APPRENANTS ==========");
+  console.log(`Nombre d'apprenants : ${apprenants.length}`);
+  
+  let moyenne = 0;
+  let solide = 0;
+  let enProgression = 0;
+  let aRenforcer = 0;
+  let progression;
+   console.log("\n========== PROGRESSION DES APPRENANTS ==========");
 
-    console.log(`Nombre d'apprenants : ${apprenants.length}`);
+  for (let apprenant of apprenants) {
+    progression = calculerProgression(apprenant);
 
-    let moyenne = 0;
-
-    for (let apprenant of apprenants) {
-        let progression = calculerProgression(apprenant);
-
-        moyenne += progression.pourcentage;
-
-        console.log(
-            `${apprenant.nomComplet} : ${progression.pourcentage}% 
-Niveau : ${progression.niveau}`
-        );
+    moyenne += progression.pourcentage;
+    if (progression.niveau === "Solide") {
+      solide++;
+    } else if (progression.niveau === "En progression") {
+      enProgression++;
+    } else {
+      aRenforcer++;
     }
+    console.log(
+      `${apprenant.nomComplet} : ${progression.pourcentage}%  ---- Niveau : ${progression.niveau}`,
+    );
+    console.log(`Jours manquants : ${progression.joursManquants}`);
+    console.log(`Challenges manquants : ${progression.challengesManquants}`);
+  }
 
-    if (apprenants.length > 0) {
-        moyenne = moyenne / apprenants.length;
-    }
-
-    console.log(`Progression moyenne du groupe : ${moyenne}%`);
+  if (apprenants.length > 0) {
+    moyenne = moyenne / apprenants.length;
+  }
+  console.log("\n========== PROGRESSION MOYENNE DU GROUPE ==========")
+  console.log(`Progression moyenne du groupe : ${moyenne}%`);
+   console.log("\n========== RÉPARTITION PAR NIVEAU ==========");
+  console.log(`Solide : ${solide}`);
+  console.log(`En progression : ${enProgression}`);
+  console.log(`À renforcer : ${aRenforcer}`);
+  let apprenantsTries = trierParProgression()
+  console.log("\n =========== CLASSEMENT PAR PROGRESSION ===========")
+  for(let apprenant of apprenantsTries){
+    let progression=calculerProgression(apprenant)
+    console.log(`  ${apprenant.nomComplet} : ${ progression.pourcentage}%`)
+  }
 }
 
 module.exports = {
@@ -213,4 +229,4 @@ module.exports = {
   trierAlphabetique,
   afficherApprenants,
   afficherTableauDeBord,
-}
+};

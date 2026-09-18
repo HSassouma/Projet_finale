@@ -28,7 +28,7 @@ do {
   console.log("8. Trier les apprenants");
   console.log("0. Quitter");
 
-  choix = prompt("Votre choix : ");
+  choix = prompt("Votre choix : ").trim();
 
   switch (choix) {
     case "0":
@@ -44,57 +44,104 @@ do {
       break;
 
     case "3":
-      let a = prompt("Entrer le nom : ");
-      let b = prompt("Entrer la ville : ");
+      let nom;
 
-      ajouterApprenant(a, b);
+      do {
+        nom = prompt("Entrer le nom : ").trim();
+
+        if (nom === "") {
+          console.log("Erreur : le nom ne peut pas être vide.");
+        }
+      } while (nom === "");
+
+      let ville;
+
+      do {
+        ville = prompt("Entrer la ville : ").trim();
+
+        if (ville === "") {
+          console.log("Erreur : la ville ne peut pas être vide.");
+        }
+      } while (ville === "");
+
+      let nouvelApprenant = ajouterApprenant(nom, ville);
+      console.log(`Identifiant : ${nouvelApprenant.id}`);
 
       console.log("Apprenant ajouté avec succès !");
       break;
 
     case "4":
-      let idConsultation = prompt("Entrer l'identifiant : ");
+      let idConsultation;
+
+      do {
+        idConsultation = Number(prompt("Entrer l'identifiant : "));
+
+        if (!Number.isInteger(idConsultation) || idConsultation <= 0) {
+          console.log("Erreur : veuillez entrer un identifiant valide.");
+        }
+      } while (!Number.isInteger(idConsultation) || idConsultation <= 0);
 
       let resultatID = rechercherApprenant(idConsultation);
 
       if (resultatID.length === 0) {
         console.log("Aucun apprenant trouvé avec cet identifiant.");
       } else {
-        console.log(resultatID);
+        for (let apprenant of resultatID) {
+          console.log("\n===== APPRENANT TROUVÉ =====");
+          console.log(`ID : ${apprenant.id}`);
+          console.log(`Nom : ${apprenant.nomComplet}`);
+          console.log(`Ville : ${apprenant.ville}`);
+        }
       }
 
       break;
 
     case "5":
-      let nomRecherche = prompt("Entrer le nom : ");
+      let nomRecherche;
+
+      do {
+        nomRecherche = prompt("Entrer le nom : ").trim();
+
+        if (nomRecherche === "") {
+          console.log("Erreur : le nom ne peut pas être vide.");
+        }
+      } while (nomRecherche === "");
 
       let resultatNom = rechercherApprenant(nomRecherche);
 
       if (resultatNom.length === 0) {
         console.log("Aucun apprenant trouvé avec ce nom.");
       } else {
-        console.log(resultatNom);
+        for (let apprenant of resultatNom) {
+          console.log("\n===== APPRENANT TROUVÉ =====");
+          console.log(`ID : ${apprenant.id}`);
+          console.log(`Nom : ${apprenant.nomComplet}`);
+          console.log(`Ville : ${apprenant.ville}`);
+        }
       }
 
       break;
 
-       case "6":
+    case "6":
       let id;
+      let apprenantExiste;
 
       do {
         id = Number(prompt("Entrer l'identifiant : "));
 
-        let apprenantExiste = apprenants.find(function (apprenant) {
+        apprenantExiste = apprenants.find(function (apprenant) {
           return apprenant.id === id;
         });
 
-        if (apprenantExiste === undefined) {
+        if (!Number.isInteger(id) || id <= 0) {
+          console.log("Erreur : veuillez entrer un identifiant valide.");
+        } else if (apprenantExiste === undefined) {
           console.log("Erreur : apprenant introuvable.");
         }
       } while (
-        apprenants.find(function (apprenant) {
-          return apprenant.id === id;
-        }) === undefined
+        !Number.isInteger(id) ||
+        id <= 0 ||
+        apprenantExiste === undefined
       );
 
       let jour;
@@ -144,7 +191,9 @@ do {
       let challenge;
 
       do {
-        challenge = prompt("Challenge terminé ? (oui/non) : ").toLowerCase();
+        challenge = prompt("Challenge terminé ? (oui/non) : ")
+          .trim()
+          .toLowerCase();
 
         if (challenge !== "oui" && challenge !== "non") {
           console.log("Erreur : répondez uniquement par oui ou non.");
@@ -169,9 +218,26 @@ do {
 
       break;
 
-
     case "7":
-      let niveau = prompt("Entrer le niveau : ");
+      let niveau;
+
+      do {
+        niveau = prompt("Entrer le niveau : ").trim();
+
+        if (
+          niveau.toLowerCase() !== "solide" &&
+          niveau.toLowerCase() !== "en progression" &&
+          niveau.toLowerCase() !== "à renforcer"
+        ) {
+          console.log(
+            "Erreur : choisissez Solide, En progression ou À renforcer.",
+          );
+        }
+      } while (
+        niveau.toLowerCase() !== "solide" &&
+        niveau.toLowerCase() !== "en progression" &&
+        niveau.toLowerCase() !== "à renforcer"
+      );
 
       let resultatNiveau = filtrerParNiveau(niveau);
 
@@ -182,41 +248,60 @@ do {
       }
 
       break;
-
-
     case "8":
       let choixTrie;
-      do{
-        console.log("\n ============= SOUS-MENU TRI  =================")
-        console.log(" 1.Trier par progression décroissante ")
-        console.log(" 2.Trier par ordre alphabétique ")
-        console.log(" 0.Retour au menu  principal")
-        choixTrie=prompt("Votre choix :")
 
-        switch(choixTrie){
-            case"1":
-            let trieProg=trierParProgression()
-            console.log(trieProg)
-            console.log("le tri est succes")
-            break
+      do {
+        console.log("\n========== SOUS-MENU TRI ==========");
+        console.log("1. Trier par progression décroissante");
+        console.log("2. Trier par ordre alphabétique");
+        console.log("0. Retour au menu principal");
 
-            case"2":
-            let trieAlpha=trierAlphabetique()
-            console.log(trieAlpha)
-            console.log("le tri est succes")
-            break
+        choixTrie = prompt("Votre choix : ").trim();
 
-            case"0":
-             break 
+        switch (choixTrie) {
+          case "1":
+            let trieProg = trierParProgression();
+
+            console.log("\n===== TRI PAR PROGRESSION =====");
+            for (let apprenant of trieProg) {
+              let progression = calculerProgression(apprenant);
+
+              console.log(`\nID : ${apprenant.id}`);
+              console.log(`Nom : ${apprenant.nomComplet}`);
+              console.log(`Ville : ${apprenant.ville}`);
+              console.log(`Progression : ${progression.pourcentage}%`);
+              console.log(`Niveau : ${progression.niveau}`);
+            }
+
+            break;
+
+          case "2":
+            let trieAlpha = trierAlphabetique();
+
+            console.log("\n===== TRI ALPHABÉTIQUE =====");
+            for (let apprenant of trieAlpha) {
+              let progression = calculerProgression(apprenant);
+
+              console.log(`\nID : ${apprenant.id}`);
+              console.log(`Nom : ${apprenant.nomComplet}`);
+              console.log(`Ville : ${apprenant.ville}`);
+              console.log(`Progression : ${progression.pourcentage}%`);
+              console.log(`Niveau : ${progression.niveau}`);
+            }
+
+            break;
+
+          case "0":
+            break;
+
+          default:
+            console.log("Erreur : choisissez 1, 2 ou 0.");
         }
+      } while (choixTrie !== "0");
 
-      }while(choixTrie!=="0")
-        break 
-    
-
-
+      break;
     default:
       console.log("Choix invalide !");
   }
-
 } while (choix !== "0");
