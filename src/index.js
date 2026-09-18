@@ -244,9 +244,16 @@ do {
       if (resultatNiveau.length === 0) {
         console.log("Aucun apprenant trouvé pour ce niveau.");
       } else {
-        console.log(resultatNiveau);
-      }
+        console.log(`\n===== APPRENANTS : ${niveau} =====`);
 
+        for (let apprenant of resultatNiveau) {
+          let progression = calculerProgression(apprenant);
+
+          console.log(`\nID : ${apprenant.id}`);
+          console.log(`Nom : ${apprenant.nomComplet}`);
+          console.log(`Ville : ${apprenant.ville}`);
+        }
+      }
       break;
     case "8":
       let choixTrie;

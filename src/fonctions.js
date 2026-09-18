@@ -172,15 +172,15 @@ function afficherApprenants() {
 
 function afficherTableauDeBord() {
   console.log("\n===== TABLEAU DE BORD =====");
-   console.log("\n========== NOMBRE D'APPRENANTS ==========");
+  console.log("\n========== NOMBRE D'APPRENANTS ==========");
   console.log(`Nombre d'apprenants : ${apprenants.length}`);
-  
+
   let moyenne = 0;
   let solide = 0;
   let enProgression = 0;
   let aRenforcer = 0;
   let progression;
-   console.log("\n========== PROGRESSION DES APPRENANTS ==========");
+  console.log("\n========== PROGRESSION DES APPRENANTS ==========");
 
   for (let apprenant of apprenants) {
     progression = calculerProgression(apprenant);
@@ -198,22 +198,25 @@ function afficherTableauDeBord() {
     );
     console.log(`Jours manquants : ${progression.joursManquants}`);
     console.log(`Challenges manquants : ${progression.challengesManquants}`);
+    console.log(`Exercices terminés : ${progression.totalTermines}`);
+    console.log(`Exercices proposés : ${progression.totalProposes}`);
+    console.log("\n")
   }
 
   if (apprenants.length > 0) {
     moyenne = moyenne / apprenants.length;
   }
-  console.log("\n========== PROGRESSION MOYENNE DU GROUPE ==========")
+  console.log("\n========== PROGRESSION MOYENNE DU GROUPE ==========");
   console.log(`Progression moyenne du groupe : ${moyenne}%`);
-   console.log("\n========== RÉPARTITION PAR NIVEAU ==========");
+  console.log("\n========== RÉPARTITION PAR NIVEAU ==========");
   console.log(`Solide : ${solide}`);
   console.log(`En progression : ${enProgression}`);
   console.log(`À renforcer : ${aRenforcer}`);
-  let apprenantsTries = trierParProgression()
-  console.log("\n =========== CLASSEMENT PAR PROGRESSION ===========")
-  for(let apprenant of apprenantsTries){
-    let progression=calculerProgression(apprenant)
-    console.log(`  ${apprenant.nomComplet} : ${ progression.pourcentage}%`)
+  let apprenantsTries = trierParProgression();
+  console.log("\n =========== CLASSEMENT PAR PROGRESSION ===========");
+  for (let apprenant of apprenantsTries) {
+    let progression = calculerProgression(apprenant);
+    console.log(`  ${apprenant.nomComplet} : ${progression.pourcentage}%`);
   }
 }
 
