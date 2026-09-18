@@ -28,43 +28,45 @@ function ajouterApprenant( nom, ville) {
 // //************************************* */
 
 function enregistrerResultat(
-  id,
-  jour,
-  exercicesPropose,
-  exerciceTermine,
-  challengeTermine,
+    id,
+    jour,
+    exercicesPropose,
+    exerciceTermine,
+    challengeTermine
 ) {
 
-  let apprenant = apprenants.find(function (apprenant) {
-    return apprenant.id === id;
-  });
-  if (apprenant === undefined) {
-    return false;
-  }
-  if (!validerResultat(exerciceTermine, exercicesPropose)) {
-    return false;
-  }
-  if (jour > 7 || jour < 1) {
-    return false;
-  }
-  let resultat = apprenant.resultats.find(function (resultat) {
-    return resultat.jour === jour;
-  });
-  if (resultat !== undefined) {
-    resultat.exercicesTermines = exerciceTermine;
-    resultat.totalExercices = exercicesPropose;
-    resultat.challengeTermine = challengeTermine;
-  } else {
-    apprenant.resultats.push({
-      jour: jour,
-      exercicesTermines: exerciceTermine,
-      totalExercices: exercicesPropose,
-      challengeTermine: challengeTermine,
+    let apprenant = apprenants.find(function (apprenant) {
+        return apprenant.id === id;
     });
-  }
-  return true;
-}
 
+    if (apprenant === undefined) {
+        return false;
+    }
+
+    let resultat = apprenant.resultats.find(function (resultat) {
+        return resultat.jour === jour;
+    });
+
+    if (resultat !== undefined) {
+
+        resultat.exercicesTermines = exerciceTermine;
+        resultat.totalExercices = exercicesPropose;
+        resultat.challengeTermine = challengeTermine;
+
+        return true;
+
+    } else {
+
+        apprenant.resultats.push({
+            jour: jour,
+            exercicesTermines: exerciceTermine,
+            totalExercices: exercicesPropose,
+            challengeTermine: challengeTermine
+        });
+
+        return true;
+    }
+}
 
 // //************************************* */
 
